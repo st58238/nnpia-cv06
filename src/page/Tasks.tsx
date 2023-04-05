@@ -1,25 +1,29 @@
-import TaskCard from '../component/TaskCard'
 import {Task, tasks} from "../data/init-data";
-import {useState} from "react";
+import TaskList from "../component/TaskList";
+import {useEffect, useState} from "react";
 
 const Tasks = () => {
-  const [taskList, setTaskList] = useState<Array<Task>>(tasks)
+    const [taskList, setTaskList] = useState<Array<Task>>(tasks)
+    useEffect(() => {
+        fetchData()
+    }, [])
 
-  const taskDoneHandle = (task: Task) => {
-    console.log("Change")
-    setTaskList([...taskList])
+  const fetchData = async () => {
+        const baseURL = import.meta.env.VITE_BACKEND_URL
+    const result = await fetch(`${baseURL}/tasks`)
+      const data = await result.json() as Array<Task>
+
+      const newData = data.map(e => {
+          const { creationDate, updateDate, ...rest } = e
+          return {
+              creationDate: new Date(creationDate),
+              updateDate: new Date(updateDate),
+              ...rest
+          }
+      })
+    setTaskList(newData)
   }
-
-  return <div>
-    <h1>Aktuální tasky</h1>
-      {taskList.filter(t => !t.done).map(t =>
-          <TaskCard task={t} key={t.id} onTaskDone={taskDoneHandle} />
-      )}
-    <h1>Splněné tasky</h1>
-    {taskList.filter(t => t.done).map(t =>
-        <TaskCard task={t} key={t.id} onTaskDone={taskDoneHandle} />
-    )}
-  </div>
+  return <TaskList taskList={taskList} />
 }
 
 export default Tasks

@@ -4,7 +4,7 @@ export interface Task {
     title: string,
     description: string,
     creationDate: Date,
-    updateDate?: Date,
+    updateDate: Date,
     done: boolean
 }
 
